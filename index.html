@@ -238,6 +238,41 @@
     margin-top: 6px;
     opacity: 0.6;
   }
+  #hint-dblclick {
+    position: fixed;
+    bottom: 14px;
+    right: 18px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 10px;
+    color: #fff;
+    opacity: 0.18;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: 0.3px;
+  }
+  #fullscreen-btn {
+    position: fixed;
+    top: 14px;
+    right: 18px;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s;
+    padding: 0;
+  }
+  #fullscreen-btn:hover {
+    opacity: 0.7;
+  }
   #brand {
     position: fixed;
     top: 14px;
@@ -272,6 +307,8 @@
 <canvas id="c"></canvas>
 <div id="brand">kong-i</div>
 <div id="footer-email">spencer.roh@gmail.com</div>
+<div id="hint-dblclick">더블클릭: 설정</div>
+<button id="fullscreen-btn" title="전체화면">⛶</button>
 
 <div id="overlay"></div>
 <div id="options">
@@ -344,6 +381,7 @@
         <button class="opt-btn" data-speed="slow">느림</button>
         <button class="opt-btn active" data-speed="normal">보통</button>
         <button class="opt-btn" data-speed="fast">빠름</button>
+        <button class="opt-btn" data-speed="vfast">매우 빠름</button>
       </div>
     </div>
 
@@ -370,6 +408,16 @@
         <button class="opt-btn active" data-drift="low">약</button>
         <button class="opt-btn" data-drift="medium">중</button>
         <button class="opt-btn" data-drift="high">강</button>
+      </div>
+    </div>
+
+    <div class="opt-group">
+      <label>장애물</label>
+      <div class="opt-row">
+        <button class="opt-btn" data-obstacles="off">없음</button>
+        <button class="opt-btn" data-obstacles="low">적음</button>
+        <button class="opt-btn active" data-obstacles="normal">보통</button>
+        <button class="opt-btn" data-obstacles="high">많음</button>
       </div>
     </div>
 
@@ -431,9 +479,10 @@ window.addEventListener('resize', resize);
 
 // --- Settings ---
 const sizeMap = { small: 8, medium: 16, large: 24 };
-const speedMap = { slow: 1.17, normal: 2.33, fast: 3.5 };
+const speedMap = { slow: 1.17, normal: 2.33, fast: 3.5, vfast: 7.0 };
 const driftMap = { off: 0, low: 0.06, medium: 0.15, high: 0.35 };
-const defaults = { mode:'light', colorTheme:'inverted', size:'small', shape:'circle', speed:'normal', drift:'low', glow:'on', trail:'on', pause:'bounce', pausedur:'1', bgUrl:'', bgopacity:50 };
+const obsMap = { off: 0, low: 5, normal: 10, high: 15 };
+const defaults = { mode:'light', colorTheme:'inverted', size:'small', shape:'circle', speed:'normal', drift:'low', glow:'on', trail:'on', pause:'bounce', pausedur:'1', obstacles:'normal', bgUrl:'', bgopacity:50 };
 
 function loadSettings() {
   try {
@@ -510,6 +559,9 @@ function updatePanelTheme() {
   const overlayColor = isLight ? '#000' : '#fff';
   document.getElementById('brand').style.color = overlayColor;
   document.getElementById('footer-email').style.color = overlayColor;
+  document.getElementById('hint-dblclick').style.color = overlayColor;
+  document.getElementById('fullscreen-btn').style.color = isLight ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
+  document.getElementById('fullscreen-btn').style.borderColor = isLight ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)';
 }
 
 // Bind option buttons
@@ -542,6 +594,7 @@ document.getElementById('bgOpacitySlider').addEventListener('input', (e) => {
   saveSettings();
 });
 bindOption('trail');
+bindOption('obstacles', () => { generateObstacles(); });
 
 // Restore UI from saved settings
 function restoreUI() {
@@ -556,6 +609,7 @@ function restoreUI() {
   document.querySelectorAll('[data-pausedur]').forEach(b => b.classList.toggle('active', b.dataset.pausedur === settings.pausedur));
   document.getElementById('pauseDurGroup').style.display = settings.pause === 'off' ? 'none' : 'block';
   document.querySelectorAll('[data-trail]').forEach(b => b.classList.toggle('active', b.dataset.trail === settings.trail));
+  document.querySelectorAll('[data-obstacles]').forEach(b => b.classList.toggle('active', b.dataset.obstacles === settings.obstacles));
   document.getElementById('bgOpacitySlider').value = settings.bgopacity;
   document.getElementById('bgOpacityVal').textContent = settings.bgopacity;
   document.getElementById('bgUrlInput').value = settings.bgUrl;
@@ -642,7 +696,6 @@ let noiseTime = Math.random() * 1000;
 
 // --- Obstacles ---
 const obstacles = [];
-const OBS_COUNT = 10;
 
 function createOneObstacle() {
   const w = 40 + Math.random() * 160;
@@ -654,7 +707,8 @@ function createOneObstacle() {
 
 function generateObstacles() {
   obstacles.length = 0;
-  for (let i = 0; i < OBS_COUNT; i++) obstacles.push(createOneObstacle());
+  const count = obsMap[settings.obstacles] ?? 10;
+  for (let i = 0; i < count; i++) obstacles.push(createOneObstacle());
 }
 generateObstacles();
 
@@ -1151,7 +1205,7 @@ function update(now, scale) {
       playBounceSound();
       spawnParticles(ball.x, ball.y, colors[colorIndex]);
       obstacles.splice(i, 1);
-      obstacles.push(createOneObstacle());
+      if (obstacles.length < (obsMap[settings.obstacles] ?? 10)) obstacles.push(createOneObstacle());
       if (settings.pause === 'bounce') triggerPause(now);
     }
   }
@@ -1248,6 +1302,19 @@ canvas.addEventListener('dblclick', (e) => {
 window.addEventListener('resize', () => {
   resize();
   generateObstacles();
+});
+
+// --- Fullscreen ---
+const fsBtn = document.getElementById('fullscreen-btn');
+fsBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+document.addEventListener('fullscreenchange', () => {
+  fsBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
 });
 
 // --- Wake Lock (prevent screen saver) ---
