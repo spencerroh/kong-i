@@ -281,8 +281,8 @@
     <div class="opt-group">
       <label>모드</label>
       <div class="opt-row">
-        <button class="opt-btn active" data-mode="dark">다크</button>
-        <button class="opt-btn" data-mode="light">라이트</button>
+        <button class="opt-btn" data-mode="dark">다크</button>
+        <button class="opt-btn active" data-mode="light">라이트</button>
       </div>
     </div>
 
@@ -298,7 +298,7 @@
     <div class="opt-group opt-full">
       <label>색상</label>
       <div class="opt-row">
-        <button class="opt-btn active" data-color="rainbow">
+        <button class="opt-btn" data-color="rainbow">
           무지개
           <div class="color-dots">
             <span class="color-dot" style="background:#ff0000"></span>
@@ -309,7 +309,7 @@
             <span class="color-dot" style="background:#9900ff"></span>
           </div>
         </button>
-        <button class="opt-btn" data-color="inverted">
+        <button class="opt-btn active" data-color="inverted">
           반전
           <div class="color-dots">
             <span class="color-dot" style="background:#ffffff"></span>
@@ -342,8 +342,8 @@
       <label>속도</label>
       <div class="opt-row">
         <button class="opt-btn" data-speed="slow">느림</button>
-        <button class="opt-btn" data-speed="normal">보통</button>
-        <button class="opt-btn active" data-speed="fast">빠름</button>
+        <button class="opt-btn active" data-speed="normal">보통</button>
+        <button class="opt-btn" data-speed="fast">빠름</button>
       </div>
     </div>
 
@@ -367,8 +367,8 @@
       <label>흔들림</label>
       <div class="opt-row">
         <button class="opt-btn" data-drift="off">없음</button>
-        <button class="opt-btn" data-drift="low">약</button>
-        <button class="opt-btn active" data-drift="medium">중</button>
+        <button class="opt-btn active" data-drift="low">약</button>
+        <button class="opt-btn" data-drift="medium">중</button>
         <button class="opt-btn" data-drift="high">강</button>
       </div>
     </div>
@@ -376,8 +376,8 @@
     <div class="opt-group">
       <label>멈춤</label>
       <div class="opt-row">
-        <button class="opt-btn active" data-pause="off">없음</button>
-        <button class="opt-btn" data-pause="bounce">충돌시</button>
+        <button class="opt-btn" data-pause="off">없음</button>
+        <button class="opt-btn active" data-pause="bounce">충돌시</button>
         <button class="opt-btn" data-pause="3s">3초</button>
         <button class="opt-btn" data-pause="5s">5초</button>
       </div>
@@ -433,7 +433,7 @@ window.addEventListener('resize', resize);
 const sizeMap = { small: 8, medium: 16, large: 24 };
 const speedMap = { slow: 1.17, normal: 2.33, fast: 3.5 };
 const driftMap = { off: 0, low: 0.06, medium: 0.15, high: 0.35 };
-const defaults = { mode:'dark', colorTheme:'rainbow', size:'small', shape:'circle', speed:'fast', drift:'medium', glow:'on', trail:'on', pause:'off', pausedur:'1', bgUrl:'', bgopacity:50 };
+const defaults = { mode:'light', colorTheme:'inverted', size:'small', shape:'circle', speed:'normal', drift:'low', glow:'on', trail:'on', pause:'bounce', pausedur:'1', bgUrl:'', bgopacity:50 };
 
 function loadSettings() {
   try {
