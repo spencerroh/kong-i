@@ -1240,6 +1240,17 @@ function draw() {
     ctx.fill();
   }
 
+  // Debug: draw obstacles
+  if (debugObstacles) {
+    for (const o of obstacles) {
+      ctx.strokeStyle = 'rgba(255, 80, 80, 0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(o.x, o.y, o.w, o.h);
+      ctx.fillStyle = 'rgba(255, 80, 80, 0.08)';
+      ctx.fillRect(o.x, o.y, o.w, o.h);
+    }
+  }
+
   // Trail - draw from trail array
   if (settings.trail === 'on' && trail.length > 1) {
     for (let i = 0; i < trail.length; i++) {
@@ -1288,9 +1299,13 @@ function loop(now) {
 requestAnimationFrame(loop);
 
 // --- Key handler ---
+let debugObstacles = false;
 document.addEventListener('keydown', (e) => {
   if (e.key === 'o' || e.key === 'O' || e.key === 'ㅐ') {
     toggleOptions();
+  }
+  if (e.key === 'd' || e.key === 'D' || e.key === 'ㅇ') {
+    debugObstacles = !debugObstacles;
   }
 });
 
